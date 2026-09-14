@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPrivateLinkBySlug } from "@/data/privateLinks";
-import { projects } from "@/data/content";
 import { rankProjects } from "@/lib/scoring";
+import { getAllProjects } from "@/lib/projectStore";
 import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { SmartCTA } from "@/components/SmartCTA";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -25,6 +27,7 @@ export default async function PrivateOpportunityPage({
   const link = getPrivateLinkBySlug(slug);
   if (!link) notFound();
 
+  const projects = await getAllProjects();
   const selected = link.projectIds
     ? projects.filter((p) => link.projectIds!.includes(p.id))
     : rankProjects(projects, { intent: link.intent, industry: link.industry });

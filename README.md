@@ -78,6 +78,28 @@ receive these for real, wire in an email provider (Resend, Postmark,
 SendGrid) inside that route handler using an API key from `.env.local`
 (see `.env.example`) — never commit that key.
 
+### The `/admin` page and content storage
+
+`app/admin/page.tsx` is a password-gated page (see `lib/adminAuth.ts` —
+an HMAC-signed cookie derived from `ADMIN_PASSWORD`, no session store
+needed) for adding videos without a code change or a deploy.
+Submissions are written to Redis via `lib/projectStore.ts`
+(`@upstash/redis`, reading whichever env var pair Vercel injects —
+`KV_REST_API_URL`/`KV_REST_API_TOKEN` or
+`UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN`). Locally, with no
+database connected, it falls back to a gitignored JSON file at
+`.data/submitted-projects.json` so `/admin` works out of the box in
+dev; that fallback is intentionally disabled when `process.env.VERCEL`
+is set, so a production deploy without a connected database fails
+loudly (`StorageNotConnectedError`) instead of silently losing writes
+on the next deploy.
+
+`getAllProjects()` merges submitted projects (newest first) with the
+static seed list in `data/content.ts`. Every page that lists work reads
+through this function and is marked `export const dynamic =
+"force-dynamic"` so newly-added videos appear immediately rather than
+waiting for the next static rebuild.
+
 ---
 
 ## For developers
@@ -153,7 +175,15 @@ placeholder box.
 
 ### 5. Where to paste TikTok / Instagram URLs
 
-Open **`data/content.ts`**. Each piece of content is one block that
+**The easy way — the `/admin` page.** Once it's set up (see "Adding
+videos without editing code" below), go to `yoursite.com/admin`, log in
+with your password, paste a link, pick a category, and click Add. It
+shows up on the site within a few seconds — no code, no GitHub, no
+waiting for a deploy.
+
+**The manual way — editing the file directly.** If you'd rather (or
+you're setting things up before `/admin` is ready), open
+**`data/content.ts`**. Each piece of content is one block that
 looks like this:
 
 ```ts
@@ -250,3 +280,47 @@ project's **Settings → Environment Variables** to match.
 Come back to this same README any time — nothing above changes. Edit
 the relevant file in `data/`, then follow step 10 to push and step 11
 handles the rest automatically.
+
+### 14. Adding videos without editing code — setting up the `/admin` page
+
+This is a one-time setup (about 5 minutes), and only works once the
+site is deployed on Vercel (step 11).
+
+**A. Set your admin password**
+
+1. In your Vercel project, go to **Settings → Environment Variables**.
+2. Add a new variable: name it `ADMIN_PASSWORD`, and for the value,
+   type whatever password you want to use to log into `/admin`. Pick
+   something only you know — this password is the only thing
+   protecting the page.
+3. Click **Save**.
+
+**B. Connect a small database** (this is where added videos are stored)
+
+1. Still in your Vercel project, click the **Storage** tab.
+2. Click **Create Database**.
+3. Choose the **Redis** option (it may be listed as "Upstash for
+   Redis" or similar — that's the right one).
+4. Follow the prompts to create it, then make sure it's **connected**
+   to this project (Vercel usually asks you this automatically when
+   you create it from inside a project).
+5. Vercel will automatically add the right environment variables for
+   you — you don't need to copy or type anything for this part.
+
+**C. Redeploy**
+
+1. Go to the **Deployments** tab and redeploy the latest one (or just
+   push any small change — it'll redeploy on its own), so the new
+   environment variables take effect.
+
+**D. Use it**
+
+1. Go to `yoursite.com/admin` (replace with your actual domain, or the
+   `.vercel.app` one).
+2. Enter the password you set in step A.
+3. Paste a video link, give it a title, pick at least one category,
+   and click **Add**. It appears on the site right away.
+4. You can delete anything you added from that same page.
+
+If you ever see a message on `/admin` saying storage isn't connected,
+it means step B didn't finish — go back and check the Storage tab.

@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { caseStudies, getCaseStudyBySlug } from "@/data/caseStudies";
-import { getProjectBySlug, projects } from "@/data/content";
 import { WhyItWorked } from "@/components/WhyItWorked";
 import { EditorialDivider } from "@/components/EditorialDivider";
 import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { resolveCampaignSlug } from "@/lib/campaignLinks";
 import { rankProjects } from "@/lib/scoring";
+import { getAllProjects } from "@/lib/projectStore";
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  const slugs = new Set<string>();
-  caseStudies.forEach((c) => slugs.add(c.slug));
-  projects.forEach((p) => slugs.add(p.slug));
-  return Array.from(slugs).map((slug) => ({ slug }));
+  return caseStudies.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({
@@ -23,7 +22,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const caseStudy = getCaseStudyBySlug(slug);
-  const project = getProjectBySlug(slug);
+  const projects = await getAllProjects();
+  const project = projects.find((p) => p.slug === slug);
   const campaign = resolveCampaignSlug(slug);
   if (campaign) {
     const label = campaign.type === "industry" ? campaign.industry : campaign.intent;
@@ -44,6 +44,8 @@ export default async function CaseStudyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const projects = await getAllProjects();
+
   // Clean campaign links (/work/beauty, /work/nyc, /work/social-strategy) pull
   // straight from the shared portfolio database — no duplicated content.
   const campaign = resolveCampaignSlug(slug);
@@ -69,7 +71,8 @@ export default async function CaseStudyPage({
   }
 
   const caseStudy = getCaseStudyBySlug(slug);
-  const project = getProjectBySlug(caseStudy?.projectId ?? slug) ?? getProjectBySlug(slug);
+  const project =
+    projects.find((p) => p.id === caseStudy?.projectId) ?? projects.find((p) => p.slug === slug);
 
   if (!project) notFound();
 

@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { projects } from "@/data/content";
+import { Project } from "@/types";
 import { rankProjects } from "@/lib/scoring";
 import { useIntent } from "@/context/IntentContext";
 import { PortfolioGrid } from "./PortfolioGrid";
 import { VISITOR_INTENTS } from "@/types";
 
-export function FeaturedWork() {
+export function FeaturedWork({ projects }: { projects: Project[] }) {
   const { intent, industry } = useIntent();
   const ranked = rankProjects(projects, {
     intent: intent ?? "explore",

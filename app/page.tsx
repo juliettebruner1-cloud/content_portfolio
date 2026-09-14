@@ -9,21 +9,24 @@ import { CuratedView } from "@/components/CuratedView";
 import { EditorialDivider } from "@/components/EditorialDivider";
 import { BrandStrip } from "@/components/BrandStrip";
 import { Testimonials } from "@/components/Testimonials";
-import { projects } from "@/data/content";
 import { profile } from "@/data/profile";
+import { getAllProjects } from "@/lib/projectStore";
 
-const signatureProject = [...projects]
-  .filter((p) => p.whyItWorked)
-  .sort((a, b) => b.strategyScore - a.strategyScore)[0];
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const projects = await getAllProjects();
+  const signatureProject = [...projects]
+    .filter((p) => p.whyItWorked)
+    .sort((a, b) => b.strategyScore - a.strategyScore)[0];
+
   return (
     <>
       <Hero />
 
       <IntentSelector />
 
-      <FeaturedWork />
+      <FeaturedWork projects={projects} />
 
       <div className="mx-auto max-w-editorial px-5 sm:px-8">
         <MetricsStrip />

@@ -1,11 +1,14 @@
 import { MetadataRoute } from "next";
-import { projects } from "@/data/content";
 import { caseStudies } from "@/data/caseStudies";
 import { writing } from "@/data/writing";
+import { getAllProjects } from "@/lib/projectStore";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://juliettebruner.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const projects = await getAllProjects();
   const staticRoutes = ["", "/work", "/about", "/writing", "/resume", "/contact"].map((path) => ({
     url: `${siteUrl}${path}`,
     lastModified: new Date(),
