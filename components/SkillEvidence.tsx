@@ -8,12 +8,28 @@ import { projects } from "@/data/content";
 export function SkillEvidence() {
   const [openId, setOpenId] = useState<string | null>(null);
 
+  const skillsWithEvidence = skills
+    .map((skill) => ({
+      skill,
+      evidence: projects.filter((p) => skill.evidenceProjectIds.includes(p.id)),
+    }))
+    .filter(({ evidence }) => evidence.length > 0);
+
+  if (skillsWithEvidence.length === 0) {
+    return (
+      <p className="label border-y hairline py-10 text-taupe">
+        Skills — development placeholder. Once real projects exist in{" "}
+        <code className="text-stone">data/content.ts</code>, link them to a skill&rsquo;s{" "}
+        <code className="text-stone">evidenceProjectIds</code> in{" "}
+        <code className="text-stone">data/skills.ts</code> to populate this section.
+      </p>
+    );
+  }
+
   return (
     <div className="divide-y hairline border-y hairline">
-      {skills.map((skill) => {
-        const evidence = projects.filter((p) => skill.evidenceProjectIds.includes(p.id));
+      {skillsWithEvidence.map(({ skill, evidence }) => {
         const isOpen = openId === skill.id;
-        if (evidence.length === 0) return null;
         return (
           <div key={skill.id}>
             <button

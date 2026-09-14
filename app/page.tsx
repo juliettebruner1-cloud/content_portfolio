@@ -29,9 +29,11 @@ export default function HomePage() {
         <MetricsStrip />
       </div>
 
-      <div className="mx-auto max-w-editorial px-5 py-20 sm:px-8">
-        <ContentSignals projects={projects} />
-      </div>
+      {projects.length > 0 && (
+        <div className="mx-auto max-w-editorial px-5 py-20 sm:px-8">
+          <ContentSignals projects={projects} />
+        </div>
+      )}
 
       {signatureProject && (
         <section className="mx-auto max-w-editorial px-5 py-20 sm:px-8">

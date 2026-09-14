@@ -63,7 +63,14 @@ function WorkPageInner() {
       </div>
 
       <div className="mt-10">
-        <PortfolioGrid projects={filtered} />
+        <PortfolioGrid
+          projects={filtered}
+          emptyMessage={
+            projects.length === 0
+              ? "No work has been added yet — check back soon."
+              : undefined
+          }
+        />
       </div>
 
       <div className="mt-16 border-t hairline pt-10">

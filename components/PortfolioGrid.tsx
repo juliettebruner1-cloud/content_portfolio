@@ -5,15 +5,17 @@ import { Project } from "@/types";
 import { VideoCard } from "./VideoCard";
 import { VideoModal } from "./VideoModal";
 
-export function PortfolioGrid({ projects }: { projects: Project[] }) {
+export function PortfolioGrid({
+  projects,
+  emptyMessage = "Nothing matches yet — try another filter.",
+}: {
+  projects: Project[];
+  emptyMessage?: string;
+}) {
   const [selected, setSelected] = useState<Project | null>(null);
 
   if (projects.length === 0) {
-    return (
-      <p className="label py-16 text-center text-taupe">
-        Nothing matches yet — try another filter.
-      </p>
-    );
+    return <p className="label py-16 text-center text-taupe">{emptyMessage}</p>;
   }
 
   return (

@@ -9,6 +9,9 @@ export interface SocialLink {
 export const socialLinks: SocialLink[] = [
   { platform: "TikTok", label: "TikTok", href: "https://www.tiktok.com/@juliettebruner" },
   { platform: "Instagram", label: "Instagram", href: "https://www.instagram.com/juliettebruner" },
-  // No LinkedIn handle supplied yet — add one here when there is one:
-  // { platform: "LinkedIn", label: "LinkedIn", href: "https://www.linkedin.com/in/..." },
+  {
+    platform: "LinkedIn",
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/juliette-bruner-b27867202",
+  },
 ];

@@ -33,7 +33,14 @@ export function FeaturedWork() {
         </Link>
       </div>
 
-      <PortfolioGrid projects={ranked} />
+      <PortfolioGrid
+        projects={ranked}
+        emptyMessage={
+          projects.length === 0
+            ? "New work is on the way — check back soon."
+            : undefined
+        }
+      />
     </section>
   );
 }
