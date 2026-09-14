@@ -100,6 +100,21 @@ through this function and is marked `export const dynamic =
 "force-dynamic"` so newly-added videos appear immediately rather than
 waiting for the next static rebuild.
 
+### Live embeds vs. stored metrics
+
+There's an important distinction: the Views/Likes/Comments/Shares
+fields on the `/admin` form are **not** kept in sync with TikTok — they
+exist only to feed `lib/scoring.ts` (so "Most Shared," ranking, etc.
+work). What visitors actually *see* is different: `components/VideoModal.tsx`
+renders TikTok's/Instagram's own official embed widget
+(`components/embeds/TikTokEmbed.tsx`, `InstagramEmbed.tsx`) for any
+real (non-sample) project with a full share URL. That widget is loaded
+directly from tiktok.com/instagram.com in the visitor's browser, so it
+shows genuinely live, real-time public numbers — we're not storing or
+proxying them. A shortened TikTok link (`vm.tiktok.com/...`) doesn't
+contain the video ID the embed needs, so those fall back to a plain
+"View on TikTok" link instead of a broken embed.
+
 ---
 
 ## For developers

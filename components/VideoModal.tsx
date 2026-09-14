@@ -7,6 +7,19 @@ import { Project } from "@/types";
 import { formatCompactNumber, formatFullDate } from "@/lib/utils";
 import { WhyItWorked } from "./WhyItWorked";
 import { track } from "@/lib/analytics";
+import { TikTokEmbed, extractTikTokVideoId } from "./embeds/TikTokEmbed";
+import { InstagramEmbed } from "./embeds/InstagramEmbed";
+
+function getLiveEmbed(project: Project) {
+  if (project.isPlaceholder || !project.url) return null;
+  if (project.platform === "TikTok" && extractTikTokVideoId(project.url)) {
+    return <TikTokEmbed url={project.url} />;
+  }
+  if (project.platform === "Instagram") {
+    return <InstagramEmbed url={project.url} />;
+  }
+  return null;
+}
 
 export function VideoModal({
   project,
@@ -54,85 +67,113 @@ export function VideoModal({
             onClick={(e) => e.stopPropagation()}
             className="max-h-[92vh] w-full max-w-3xl overflow-y-auto border hairline bg-ink"
           >
-            <div className="flex items-start justify-between border-b hairline px-6 py-4">
-              <div>
-                <p className="label text-taupe">
-                  {project.platform} &middot; {formatFullDate(project.date)}
-                </p>
-                <h2 id="video-modal-title" className="mt-1 font-serif text-2xl text-ivory">
-                  {project.title}
-                </h2>
-              </div>
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={onClose}
-                className="label border hairline px-3 py-2 text-taupe hover:text-ivory"
-                aria-label="Close"
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="space-y-8 px-6 py-6">
-              <p className="text-sm leading-relaxed text-stone">{project.description}</p>
-
-              <div className="flex flex-wrap gap-2">
-                {project.categories.map((c) => (
-                  <span key={c} className="label border hairline px-2 py-1 text-taupe">
-                    {c}
-                  </span>
-                ))}
-              </div>
-
-              {Object.values(project.metrics).some(Boolean) && (
-                <div className="grid grid-cols-3 gap-4 border-y hairline py-6 sm:grid-cols-5">
-                  {project.metrics.views && <Stat label="Views" value={formatCompactNumber(project.metrics.views)} />}
-                  {project.metrics.engagementRate && (
-                    <Stat label="Engagement" value={`${project.metrics.engagementRate}%`} />
-                  )}
-                  {project.metrics.shares && <Stat label="Shares" value={formatCompactNumber(project.metrics.shares)} />}
-                  {project.metrics.saves && <Stat label="Saves" value={formatCompactNumber(project.metrics.saves)} />}
-                  {project.metrics.followersGained && (
-                    <Stat label="Followers" value={`+${formatCompactNumber(project.metrics.followersGained)}`} />
-                  )}
-                </div>
-              )}
-
-              {project.audienceInsight && (
-                <p className="font-serif text-lg italic leading-snug text-ivory text-balance">
-                  &ldquo;{project.audienceInsight}&rdquo;
-                </p>
-              )}
-
-              {project.whyItWorked && <WhyItWorked data={project.whyItWorked} />}
-
-              <div className="flex flex-wrap gap-4 pt-2">
-                {project.caseStudySlug && (
-                  <Link
-                    href={`/work/${project.caseStudySlug}`}
-                    data-cursor="view"
-                    className="label border hairline px-4 py-3 text-ivory hover:bg-ivory hover:text-ink"
-                  >
-                    View Full Case Study →
-                  </Link>
-                )}
-                {project.url && (
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="label border hairline px-4 py-3 text-taupe hover:text-ivory"
-                  >
-                    View on {project.platform} →
-                  </a>
-                )}
-              </div>
-            </div>
+            <VideoModalBody project={project} onClose={onClose} closeRef={closeRef} />
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function VideoModalBody({
+  project,
+  onClose,
+  closeRef,
+}: {
+  project: Project;
+  onClose: () => void;
+  closeRef: React.RefObject<HTMLButtonElement | null>;
+}) {
+  const embed = getLiveEmbed(project);
+
+  return (
+    <>
+      <div className="flex items-start justify-between border-b hairline px-6 py-4">
+        <div>
+          <p className="label text-taupe">
+            {project.platform} &middot; {formatFullDate(project.date)}
+          </p>
+          <h2 id="video-modal-title" className="mt-1 font-serif text-2xl text-ivory">
+            {project.title}
+          </h2>
+        </div>
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          className="label border hairline px-3 py-2 text-taupe hover:text-ivory"
+          aria-label="Close"
+        >
+          Close
+        </button>
+      </div>
+
+      <div className="space-y-8 px-6 py-6">
+        {embed && (
+          <div>
+            {embed}
+            <p className="label mt-3 text-center text-taupe">
+              Live from {project.platform} — views, likes, and comments above update in real
+              time.
+            </p>
+          </div>
+        )}
+
+        <p className="text-sm leading-relaxed text-stone">{project.description}</p>
+
+        <div className="flex flex-wrap gap-2">
+          {project.categories.map((c) => (
+            <span key={c} className="label border hairline px-2 py-1 text-taupe">
+              {c}
+            </span>
+          ))}
+        </div>
+
+        {!embed && Object.values(project.metrics).some(Boolean) && (
+          <div className="grid grid-cols-3 gap-4 border-y hairline py-6 sm:grid-cols-5">
+            {project.metrics.views && <Stat label="Views" value={formatCompactNumber(project.metrics.views)} />}
+            {project.metrics.engagementRate && (
+              <Stat label="Engagement" value={`${project.metrics.engagementRate}%`} />
+            )}
+            {project.metrics.shares && <Stat label="Shares" value={formatCompactNumber(project.metrics.shares)} />}
+            {project.metrics.saves && <Stat label="Saves" value={formatCompactNumber(project.metrics.saves)} />}
+            {project.metrics.followersGained && (
+              <Stat label="Followers" value={`+${formatCompactNumber(project.metrics.followersGained)}`} />
+            )}
+          </div>
+        )}
+
+        {project.audienceInsight && (
+          <p className="font-serif text-lg italic leading-snug text-ivory text-balance">
+            &ldquo;{project.audienceInsight}&rdquo;
+          </p>
+        )}
+
+        {project.whyItWorked && <WhyItWorked data={project.whyItWorked} />}
+
+        <div className="flex flex-wrap gap-4 pt-2">
+          {project.caseStudySlug && (
+            <Link
+              href={`/work/${project.caseStudySlug}`}
+              data-cursor="view"
+              className="label border hairline px-4 py-3 text-ivory hover:bg-ivory hover:text-ink"
+            >
+              View Full Case Study →
+            </Link>
+          )}
+          {project.url && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="label border hairline px-4 py-3 text-taupe hover:text-ivory"
+            >
+              View on {project.platform} →
+            </a>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

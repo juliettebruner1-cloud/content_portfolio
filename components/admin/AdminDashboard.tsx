@@ -237,7 +237,13 @@ export function AdminDashboard({ initialProjects }: { initialProjects: Project[]
         </fieldset>
 
         <fieldset>
-          <legend className="label mb-3 text-taupe">Numbers (optional — only fill in what you know)</legend>
+          <legend className="label mb-3 text-taupe">Numbers (optional)</legend>
+          <p className="mb-3 text-xs text-taupe">
+            For a TikTok or Instagram link, visitors already see the real, live numbers in the
+            embedded video itself — these fields are just used behind the scenes to sort and rank
+            content on the site (like the &ldquo;Most Shared&rdquo; badges). No need to keep them
+            updated.
+          </p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <NumberField label="Views" value={views} onChange={setViews} />
             <NumberField label="Likes" value={likes} onChange={setLikes} />
