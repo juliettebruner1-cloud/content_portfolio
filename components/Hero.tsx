@@ -41,13 +41,6 @@ export function Hero({ backgroundImage }: { backgroundImage?: string }) {
         />
       )}
 
-      {!reduced && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 animate-flash bg-ivory"
-        />
-      )}
-
       <div className="relative z-10 flex items-center justify-between">
         <span className="label text-taupe">{profile.heroKicker}</span>
         <span className="label text-taupe">{profile.issueNumber}</span>

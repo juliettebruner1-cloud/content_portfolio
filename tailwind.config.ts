@@ -48,12 +48,6 @@ const config: Config = {
           "80%": { transform: "translate(-4%, 0)" },
           "90%": { transform: "translate(3%, 4%)" },
         },
-        flash: {
-          "0%": { opacity: "0" },
-          "3%": { opacity: "0.12" },
-          "6%": { opacity: "0" },
-          "100%": { opacity: "0" },
-        },
         marquee: {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-50%)" },
@@ -61,7 +55,6 @@ const config: Config = {
       },
       animation: {
         grain: "grain 8s steps(10) infinite",
-        flash: "flash 6s ease-out 1",
         marquee: "marquee 40s linear infinite",
       },
     },
