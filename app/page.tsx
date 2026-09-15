@@ -19,10 +19,13 @@ export default async function HomePage() {
   const signatureProject = [...projects]
     .filter((p) => p.whyItWorked)
     .sort((a, b) => b.strategyScore - a.strategyScore)[0];
+  const heroImage =
+    projects.find((p) => p.featured && p.thumbnail)?.thumbnail ??
+    projects.find((p) => p.thumbnail)?.thumbnail;
 
   return (
     <>
-      <Hero />
+      <Hero backgroundImage={heroImage} />
 
       <IntentSelector />
 

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { profile } from "@/data/profile";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-export function Hero() {
+export function Hero({ backgroundImage }: { backgroundImage?: string }) {
   const [statementIndex, setStatementIndex] = useState(0);
   const reduced = useReducedMotion();
 
@@ -18,28 +18,42 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-[calc(100svh-65px)] flex-col justify-between overflow-hidden border-b hairline px-5 pb-10 pt-14 sm:px-8">
-      {!reduced && (
+      {backgroundImage ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={backgroundImage}
+            alt=""
+            className="absolute inset-0 z-0 h-full w-full scale-105 object-cover"
+            style={{ filter: "brightness(0.5) contrast(1.05) saturate(1.1)" }}
+          />
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/50 via-black/55 to-black" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+        </>
+      ) : (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 animate-flash bg-ivory"
+          className="pointer-events-none absolute inset-0 z-0 opacity-60"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(244,241,235,0.06), transparent 70%)",
+          }}
         />
       )}
 
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(244,241,235,0.06), transparent 70%)",
-        }}
-      />
+      {!reduced && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 animate-flash bg-ivory"
+        />
+      )}
 
-      <div className="relative flex items-center justify-between">
+      <div className="relative z-10 flex items-center justify-between">
         <span className="label text-taupe">{profile.heroKicker}</span>
         <span className="label text-taupe">{profile.issueNumber}</span>
       </div>
 
-      <div className="relative">
+      <div className="relative z-10">
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -67,7 +81,7 @@ export function Hero() {
         </motion.div>
       </div>
 
-      <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <motion.p
           key={statementIndex}
           initial={{ opacity: 0, y: 8 }}
