@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/adminAuth";
 import { addProject, deleteProject, getSubmittedProjects, StorageNotConnectedError, NewVideoInput } from "@/lib/projectStore";
 import { allCategories } from "@/data/content";
+import { fetchTikTokThumbnail } from "@/lib/oembed";
 
 const PLATFORMS = ["TikTok", "Instagram", "YouTube", "Other"] as const;
 
@@ -45,7 +46,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const project = await addProject(body);
+    const thumbnail =
+      body.platform === "TikTok" ? (await fetchTikTokThumbnail(body.url)) ?? undefined : undefined;
+    const project = await addProject({ ...body, thumbnail });
     return NextResponse.json({ project });
   } catch (err) {
     if (err instanceof StorageNotConnectedError) {

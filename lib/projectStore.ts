@@ -90,6 +90,7 @@ export interface NewVideoInput {
   platform: Platform;
   categories: Category[];
   brand?: string;
+  thumbnail?: string;
   views?: number;
   likes?: number;
   comments?: number;
@@ -125,6 +126,7 @@ export function buildProject(input: NewVideoInput): Project {
     description: input.description?.trim() || input.title,
     platform: input.platform,
     url: input.url,
+    thumbnail: input.thumbnail,
     date: now,
     metrics: {
       views: input.views,
