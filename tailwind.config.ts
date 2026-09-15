@@ -50,7 +50,7 @@ const config: Config = {
         },
         flash: {
           "0%": { opacity: "0" },
-          "3%": { opacity: "0.9" },
+          "3%": { opacity: "0.12" },
           "6%": { opacity: "0" },
           "100%": { opacity: "0" },
         },
